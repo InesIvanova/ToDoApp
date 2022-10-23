@@ -11,6 +11,7 @@ from tkinter import (
     END,
 )
 from tkinter.scrolledtext import ScrolledText
+from tkinter.ttk import Combobox
 
 from tkcalendar import DateEntry
 
@@ -20,11 +21,45 @@ def clear_view(tk):
         el.destroy()
 
 
-def list_tasks_view(tk):
+def edit_task(task):
     pass
 
 
-def save_task(title, due_date, description, priority, is_completed):
+def delete_task(task):
+    pass
+
+
+def list_tasks_view(tk):
+    clear_view(tk)
+    dd = Combobox(tk, width=100)
+    all_tasks = []
+    with open("db.txt", "r") as file:
+        for line in file.readlines():
+            all_tasks.append(json.loads(line))
+
+    dd["values"] = all_tasks
+    dd.grid(row=0, column=0)
+
+    Button(
+        tk,
+        text="Edit task",
+        bg="yellow",
+        fg="black",
+        command=lambda: edit_task(dd.get()),
+    ).grid(row=2, column=0)
+    Button(
+        tk,
+        text="Delete task",
+        bg="red",
+        fg="white",
+        command=lambda: delete_task(dd.get()),
+    ).grid(row=2, column=1)
+    Button(
+        tk, text="Cancel", bg="black", fg="white", command=lambda: main_view(tk)
+    ).grid(row=3, column=0, padx=100, pady=100)
+
+
+def save_task(title, due_date, description, priority, is_completed, tk):
     task = {
         "title": title,
         "due_date": due_date,
@@ -34,7 +69,7 @@ def save_task(title, due_date, description, priority, is_completed):
     }
     with open("db.txt", "a+") as file:
         file.write(json.dumps(task) + "\n")
-    main_view()
+    main_view(tk)
 
 
 def create_task_view(tk):
@@ -61,9 +96,23 @@ def create_task_view(tk):
     chk_state.set(False)  # set check state
     chk = Checkbutton(tk, text="Choose", var=chk_state)
     chk.grid(column=1, row=4)
-    Button(tk, text="Save task", bg="green", fg="white", command=lambda: save_task(name.get(), date.get(), description.get("1.0", END), selected.get(), chk_state.get())).grid(row=5, column=0)
-    Button(tk, text="Cancel", bg="black", fg="white", command=lambda: main_view(tk)).grid(row=5, column=1, padx=100,
-                                                                                          pady=100)
+    Button(
+        tk,
+        text="Save task",
+        bg="green",
+        fg="white",
+        command=lambda: save_task(
+            name.get(),
+            date.get(),
+            description.get("1.0", END),
+            selected.get(),
+            chk_state.get(),
+            tk,
+        ),
+    ).grid(row=5, column=0)
+    Button(
+        tk, text="Cancel", bg="black", fg="white", command=lambda: main_view(tk)
+    ).grid(row=5, column=1, padx=100, pady=100)
 
 
 def main_view(tk):
