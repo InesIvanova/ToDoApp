@@ -25,14 +25,26 @@ def clear_view(tk):
         el.destroy()
 
 
-def save_changes(task, tk, title, due_date, description, priority, is_completed):
+def delete_task_from_file(task):
+    if isinstance(task, str):
+        task = ast.literal_eval(task)
     with open("db.txt", "r") as file:
         lines = file.readlines()
     with open("db.txt", "w") as file:
         for line in lines:
             if json.loads(line.strip("\n")) != task:
                 file.write(line)
-        changed_task = {"title": title, "due_date": due_date, "description": description, "priority": priority, "is_completed": is_completed}
+
+
+def delete_task(task):
+    delete_task_from_file(task)
+    main_view(tk)
+
+
+def save_changes(task, tk, title, due_date, description, priority, is_completed):
+    delete_task_from_file(task)
+    changed_task = {"title": title, "due_date": due_date, "description": description, "priority": priority, "is_completed": is_completed}
+    with open("db.txt", "a") as file:
         file.write(json.dumps(changed_task) + '\n')
     main_view(tk)
 
@@ -73,10 +85,6 @@ def edit_task(task, tk):
 
     Button(tk, text="Edit task", bg="yellow", fg="black", command=lambda: save_changes(task, tk, name.get(), date.get(), description.get("1.0", END), s.get(), chk_state.get())).grid(row=5, column=0)
     Button(tk, text="Cancel", bg="black", fg="white", command=lambda: main_view(tk)).grid(row=5, column=1, padx=100, pady=100)
-
-
-def delete_task(task):
-    pass
 
 
 def list_tasks_view(tk):
