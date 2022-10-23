@@ -25,6 +25,18 @@ def clear_view(tk):
         el.destroy()
 
 
+def save_changes(task, tk, title, due_date, description, priority, is_completed):
+    with open("db.txt", "r") as file:
+        lines = file.readlines()
+    with open("db.txt", "w") as file:
+        for line in lines:
+            if json.loads(line.strip("\n")) != task:
+                file.write(line)
+        changed_task = {"title": title, "due_date": due_date, "description": description, "priority": priority, "is_completed": is_completed}
+        file.write(json.dumps(changed_task) + '\n')
+    main_view(tk)
+
+
 def edit_task(task, tk):
     task = ast.literal_eval(task)
     clear_view(tk)
@@ -59,6 +71,7 @@ def edit_task(task, tk):
     chk = Checkbutton(tk, text='Choose', variable=chk_state, onvalue=True, offvalue=False)
     chk.grid(column=1, row=4)
 
+    Button(tk, text="Edit task", bg="yellow", fg="black", command=lambda: save_changes(task, tk, name.get(), date.get(), description.get("1.0", END), s.get(), chk_state.get())).grid(row=5, column=0)
     Button(tk, text="Cancel", bg="black", fg="white", command=lambda: main_view(tk)).grid(row=5, column=1, padx=100, pady=100)
 
 
